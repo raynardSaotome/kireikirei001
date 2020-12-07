@@ -1,0 +1,114 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <meta http-equiv="X-UA-Compatible" content="ie=edge" />
+    <title>Static Template</title>
+    <link rel="stylesheet" href="./css/webcam/normalize.css" />
+    <link rel="stylesheet" href="./css/webcam/webcamStyle.css" />
+    <link rel="stylesheet" href="./css/kirakira.css" charset="UTF-8" />
+    <link rel="stylesheet" href="./css/main.css" charset="UTF-8" />
+    <!--
+    <script src="https://r.chirimen.org/polyfill.js"></script>
+    <script src="https://r.chirimen.org/vl53l0x.js"></script>
+-->
+    <script src="./js/lib/waterflowGetter.js"></script>
+    <script src="./js/lib/VL53L0XGetter.js"></script>
+    <script src="./js/lib/webcam/clmtrackr.js"></script>
+    <script src="./js/lib/webcam/model_pca_20_svm.js"></script>
+    <script src="./js/lib/webcam/webcam.js"></script>
+
+    <script src="https://code.jquery.com/jquery-3.5.1.min.js"></script>
+    <script src="https://code.createjs.com/createjs-2013.09.25.min.js"></script>
+
+    <script src="./js/defines.js"></script>
+    <script src="./js/funcs/funcBase.js"></script>
+    <script src="./js/funcs/waiting.js"></script>
+    <script src="./js/funcs/handWashReady.js"></script>
+    <script src="./js/funcs/handWashing.js"></script>
+    <script src="./js/funcs/handWashSuccess.js"></script>
+    <script src="./js/funcs/handWashFault.js"></script>
+    <script src="./js/funcs/stopFlow.js"></script>
+
+    <script>
+      createjs = window;
+    </script>
+
+    <script src="./js/kirakira.js" charset="UTF-8"></script>
+    <script src="./js/main.js"></script>
+  </head>
+  <body>
+    <!--
+    <h1>
+      This is a static template, there is no bundler or bundling involved!
+    </h1>
+-->
+    <body>
+      <div class="wrapper">
+        <video
+          id="video"
+          style="display: none;"
+          class="video"
+          autoplay
+          playsinline="true"
+        ></video>
+        <canvas
+          id="overlay"
+          style="transform: rotateY(180deg);"
+          class="overlay"
+        ></canvas>
+        <div id="elemHandWashReady" class="chapters fade">
+          <canvas
+            id="elemHandWashReady_canvas"
+            width="1280"
+            height="760"
+          ></canvas>
+        </div>
+        <div id="elemHandWashing" class="chapters fade">
+          <canvas
+            id="elemHandWashing_canvas"
+            width="1280"
+            height="760"
+          ></canvas>
+        </div>
+        <div id="elemHandWashSuccess" class="chapters fade">
+          <canvas id="kirakira_canvas" width="1280" height="760"></canvas>
+        </div>
+        <div id="elemHandWashFault" class="chapters fade">
+          <canvas
+            id="elemHandWashFault_canvas"
+            width="1280"
+            height="760"
+          ></canvas>
+        </div>
+        <div id="elemStopFlow" class="chapters fade">
+          <canvas id="elemStopFlow_canvas" width="1280" height="760"></canvas>
+        </div>
+        <div id="debug">
+          <table>
+            <tr>
+              <td>chapter</td>
+              <td id="debugChpt"></td>
+            </tr>
+            <tr>
+              <td>flow(水流)</td>
+              <td id="fdist"></td>
+            </tr>
+            <tr>
+              <td>isRangeIn(距離)</td>
+              <td id="ddist"></td>
+            </tr>
+            <tr>
+              <td>cam(カメラ)</td>
+              <td id="cdist"></td>
+            </tr>
+          </table>
+          <button id="btflow">水流スイッチ</button>
+          <button id="btvl">距離センサ</button>
+          <button id="btcam">カメラ認識</button>
+        </div>
+      </div>
+    </body>
+  </body>
+</html>

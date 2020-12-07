@@ -1,0 +1,19 @@
+* {
+  margin: 0;
+  padding: 0;
+  border: 0;
+}
+/*
+#elemHandWashReady {
+  width: 100%;
+  height: 100%;
+  position: absolute;
+}
+*/
+#kirakira_canvas {
+  width: 100%;
+  height: 100%;
+  background-image: url("./testxxx.png");
+  background-repeat: no-repeat;
+  background-size: contain;
+}
