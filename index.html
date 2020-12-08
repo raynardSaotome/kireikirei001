@@ -18,10 +18,11 @@
     <script src="./js/lib/webcam/clmtrackr.js"></script>
     <script src="./js/lib/webcam/model_pca_20_svm.js"></script>
     <script src="./js/lib/webcam/webcam.js"></script>
-
     <script src="https://code.jquery.com/jquery-3.5.1.min.js"></script>
+    <script>
+      createjs = window;
+    </script>
     <script src="https://code.createjs.com/createjs-2013.09.25.min.js"></script>
-
     <script src="./js/defines.js"></script>
     <script src="./js/funcs/funcBase.js"></script>
     <script src="./js/funcs/waiting.js"></script>
@@ -31,19 +32,10 @@
     <script src="./js/funcs/handWashFault.js"></script>
     <script src="./js/funcs/stopFlow.js"></script>
 
-    <script>
-      createjs = window;
-    </script>
-
     <script src="./js/kirakira.js" charset="UTF-8"></script>
     <script src="./js/main.js"></script>
   </head>
   <body>
-    <!--
-    <h1>
-      This is a static template, there is no bundler or bundling involved!
-    </h1>
--->
     <body>
       <div class="wrapper">
         <video
@@ -98,6 +90,7 @@
             <tr>
               <td>isRangeIn(距離)</td>
               <td id="ddist"></td>
+              <td id="ddistDistance"></td>
             </tr>
             <tr>
               <td>cam(カメラ)</td>
