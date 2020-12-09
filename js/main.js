@@ -20,7 +20,7 @@ const mainloopInterval = 100; // メイン処理の実行間隔
 
 let masterDebugger = {
   showSensorParamDisplay: true,
-  useVL53L0XDummy: true,
+  useVL53L0XDummy: false,
   useFlowDummy: true,
   useWebcamDummy: false
 };

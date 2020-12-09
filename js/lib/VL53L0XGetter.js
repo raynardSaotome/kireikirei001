@@ -21,8 +21,7 @@ class VL53L0XGetter {
 
   async getsensorParam() {
     this._distance = (await this.vl.getRange()) + VL53L0XGetterRange_Correction;
-    //    var val = await this.vl.getRange();
-    //    this._distance = val;
+
     this.distanceMoniterElem.innerHTML = this._distance;
 
     // チャタリング対応
