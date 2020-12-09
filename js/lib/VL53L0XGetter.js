@@ -15,6 +15,7 @@ class VL53L0XGetter {
     this.flg = false;
     this.inRangeLimitTime = undefined;
     this.moniterElem = undefined;
+    this.distanceMoniterElem = undefined;
     this.debug = debug;
   }
 
@@ -22,9 +23,8 @@ class VL53L0XGetter {
     this._distance = (await this.vl.getRange()) + VL53L0XGetterRange_Correction;
     //    var val = await this.vl.getRange();
     //    this._distance = val;
-    if (this.moniterElem) {
-      this.moniterElem.innerHTML = this._distance;
-    }
+    this.distanceMoniterElem.innerHTML = this._distance;
+
     // チャタリング対応
     if (
       VL53L0XDistanceRangeMin <= this._distance &&
@@ -81,6 +81,11 @@ class VL53L0XGetter {
       this.inRangeLimitTime = undefined;
       this.flg = false;
     }
+
+    if (this.moniterElem) {
+      this.moniterElem.innerHTML = this.flg;
+    }
+
     window.setTimeout(
       await (() => {
         this.getsensorParam();
@@ -97,6 +102,8 @@ class VL53L0XGetter {
     const port = i2cAccess.ports.get(VL52L0XI2CPort);
     this.vl = new VL53L0X(port, VL52L0XI2CAddress);
     await this.vl.init(); // for Long Range Mode (<2m) : await vl.init(true);
+
+    this.distanceMoniterElem = document.getElementById("ddistDistance");
 
     window.setTimeout(
       await (() => {

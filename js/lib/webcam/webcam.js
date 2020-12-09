@@ -3,17 +3,17 @@ class webcam {
   constructor(
     videoElem,
     canvasElem,
-    constraints,
+    constraints = {
+      audio: false,
+      video: { width: { exact: 320 }, height: { exact: 240 } }
+    },
     postponement = 3000,
     debug = false
   ) {
     /* コンストラクタ */
     this.video = videoElem;
     this.canvas = canvasElem;
-    this.constraints = {
-      audio: false,
-      video: { width: { exact: 320 }, height: { exact: 240 } }
-    };
+    this.constraints = constraints;
     this.context = this.canvas.getContext("2d");
     this.track = new clm.tracker({
       useWebGL: true
@@ -25,65 +25,64 @@ class webcam {
   }
 
   start(elem) {
-    var _this = this;
+    const _this = this;
 
-    function adjustVideo() {
+    var adjustVideo = () => {
       // 映像が画面幅いっぱいに表示されるように調整
-      var ratio = window.innerWidth / _this.video.videoWidth;
+      var ratio = window.innerWidth / this.video.videoWidth;
 
-      _this.video.width = window.innerWidth;
-      _this.video.height = _this.video.videoHeight * ratio;
-      _this.canvas.width = _this.video.width;
-      _this.canvas.height = _this.video.height;
-    }
+      this.video.width = window.innerWidth;
+      this.video.height = this.video.videoHeight * ratio;
+      this.canvas.width = this.video.width;
+      this.canvas.height = this.video.height;
+    };
 
-    function startTracking() {
+    var startTracking = () => {
       // トラッキング開始
-      _this.track.start(_this.video);
-      drawLoop(_this);
-    }
+      this.track.start(this.video);
+      drawLoop();
+    };
 
-    function drawLoop() {
+    var drawLoop = () => {
+      //    function drawLoop(obj) {
       // 描画をクリア
-      _this.context.clearRect(0, 0, _this.canvas.width, _this.canvas.height);
+      this.context.clearRect(0, 0, this.canvas.width, this.canvas.height);
       // videoをcanvasにトレース
-      _this.context.drawImage(
-        _this.video,
+      this.context.drawImage(
+        this.video,
         0,
         0,
-        _this.canvas.width,
-        _this.canvas.height
+        this.canvas.width,
+        this.canvas.height
       );
 
-      if (_this.track.getCurrentPosition()) {
+      if (this.track.getCurrentPosition()) {
         // 顔のパーツの現在位置が存在
-        if (_this.debug) {
+
+        if (this.debug) {
           console.log("cCam:now Track");
         }
-        if (!_this.trackingLimiitTime) {
-          _this.trackingLimiitTime = new Date();
-          _this.trackingLimiitTime = _this.trackingLimiitTime.setMilliseconds(
-            _this.trackingLimiitTime.getMilliseconds() + _this.postponement
-          );
+        this._isTracked = true;
+        if (this.debug) {
+          this.track.draw(this.canvas);
         }
-        _this._isTracked = true;
-        if (_this.debug) {
-          _this.track.draw(_this.canvas);
-        }
+        this.trackingLimiitTime = undefined;
       } else {
-        if (
-          !_this.trackingStartime ||
-          new Date().getDate() >= _this._this.trackingLimiitTime.getDate()
-        ) {
-          _this._isTracked = false;
-          _this.trackingStartime = undefined;
+        if (this.trackingLimiitTime === undefined) {
+          this.trackingLimiitTime = new Date();
+          this.trackingLimiitTime.setMilliseconds(
+            this.trackingLimiitTime.getMilliseconds() + this.postponement
+          );
+        } else if (new Date().getTime() >= this.trackingLimiitTime.getTime()) {
+          this._isTracked = false;
+          this.trackingLimiitTime = undefined;
         }
       }
       if (elem) {
-        elem.innerHTML = _this._isTracked;
+        elem.innerHTML = this._isTracked;
       }
       requestAnimationFrame(drawLoop);
-    }
+    };
 
     this.track.init(pModel);
 
@@ -93,8 +92,8 @@ class webcam {
         this.video.srcObject = stream;
         // 動画のメタ情報のロードが完了したら実行
         this.video.onloadedmetadata = function () {
-          adjustVideo(_this);
-          startTracking(_this);
+          adjustVideo();
+          startTracking();
         };
       })
       .catch((err) => {
@@ -120,11 +119,11 @@ class webcamDummy extends webcam {
     this.debugelem = undefined;
     this.debugBtcam = document.getElementById("btcam");
     this.debugret = false;
-    var _this = this;
+    //    var _this = this;
     this.debugBtcam.onclick = () => {
-      _this.debugBtcam.value = _this.debugBtcam.value == 0 ? 1 : 0;
-      _this.debugret = _this.debugBtcam.value == 1 ? true : false;
-      if (_this.debugelem) _this.debugelem.innerHTML = _this.debugret;
+      this.debugBtcam.value = this.debugBtcam.value == 0 ? 1 : 0;
+      this.debugret = this.debugBtcam.value == 1 ? true : false;
+      if (this.debugelem) this.debugelem.innerHTML = this.debugret;
     };
   }
 

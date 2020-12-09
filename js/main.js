@@ -16,38 +16,102 @@ var nextChapter = 0; // 次に処理するフェイズのフラグ値を格納
 var previousChapter = 0; // 次に処理するフェイズのフラグ値を格納時、現行の処理中フェイズのフラグ値を格納
 const mainloopInterval = 100; // メイン処理の実行間隔
 
-let mainRoutineDebug = true; // テスト用
+//let mainRoutineDebug = true; // テスト用
+
+let masterDebugger = {
+  showSensorParamDisplay: true,
+  useVL53L0XDummy: true,
+  useFlowDummy: true,
+  useWebcamDummy: false
+};
 
 window.onload = () => {
+  async function getConstraintsDevice(deviceNames, constraints) {
+    var device = undefined;
+
+    var resolutionWidth = 1280;
+    var resolutionHeight = 760;
+
+    constraints = {
+      audio: false,
+      video: {
+        width: { exact: resolutionWidth },
+        height: { exact: resolutionHeight }
+      }
+    };
+
+    navigator.mediaDevices
+      .enumerateDevices()
+      .then(function (devices) {
+        // 成功時
+        devices.forEach(function (device) {
+          // デバイスごとの処理
+          for (var i = 0; i < deviceNames.devices.length; i++) {
+            var pattern = deviceNames.devices[i]["name"];
+            if (device.label.match(pattern)) {
+              constraints["video"]["width"]["exact"] =
+                deviceNames.devices[i]["width"];
+              constraints["video"]["height"]["exact"] =
+                deviceNames.devices[i]["height"];
+              constraints["deviceId"] = device.deviceId;
+            }
+          }
+        });
+      })
+      .catch(function (err) {
+        // エラー発生時
+        console.error("enumerateDevide ERROR:", err);
+      });
+  }
+
   // 初期化関数
   function init() {
     //Webカメラ用要素取得
     var video = document.querySelector("#video");
     var canvas = document.querySelector("#overlay");
-    var constraints = {
-      audio: false,
-      video: { width: { exact: 1280 }, height: { exact: 720 } }
-    };
+    var constraints;
+    getConstraintsDevice(useWebcamDevice, constraints);
+
     var flag = {};
 
-    if (mainRoutineDebug) {
-      //メインルーティンテスト
-      //メインルーティンテスト用ダミークラス
+    if (!masterDebugger.showSensorParamDisplay) {
+      //デバッグ用ディスプレイ
+      var debugElem = document.getElementById("#debug");
+      debugElem.style.visibility = "hidden";
+    }
+
+    if (masterDebugger.useWebcamDummy) {
+      //ダミークラス
+      flag.webcam = new webcamDummy(video, canvas, constraints, true);
+    } else {
+      document.getElementById("btcam").style.visibility = "hidden";
+      flag.webcam = new webcam(
+        video,
+        canvas,
+        constraints,
+        webcamPostponement,
+        true
+      );
+    }
+
+    if (masterDebugger.useVL53L0XDummy) {
+      //ダミークラス
+      flag.vl = new VL53L0XGetterDummy(false);
+    } else {
+      document.getElementById("btvl").style.visibility = "hidden";
+      flag.vl = new VL53L0XGetter(false);
+    }
+
+    if (masterDebugger.useFlowDummy) {
+      //ダミークラス
       flag.flow = new waterflowGetterDummy(
         WATERFLOWSIGPORT,
         WATERFLOWFLAG,
         true
       );
-      flag.vl = new VL53L0XGetterDummy(false);
-      flag.webcam = new webcamDummy(video, canvas, constraints, true);
     } else {
-      //本番
-      var debugElem = document.getElementById("#debug");
-      debugElem.style.visibility = "hidden";
-
+      Document.getElementById("btflow").style.visibility = "hidden";
       flag.flow = new waterflowGetter(WATERFLOWSIGPORT, WATERFLOWFLAG, true);
-      flag.vl = new VL53L0XGetter(false);
-      flag.webcam = new webcam(video, canvas, constraints, true);
     }
 
     return flag;
@@ -236,7 +300,28 @@ window.onload = () => {
   // メインループ
   const mainloop = () => {
     var debugChptElem = document.getElementById("debugChpt");
-    debugChptElem.innerHTML = nextChapter;
+
+    switch (nextChapter) {
+      case CHAPT_waiting:
+        debugChptElem.innerHTML = "待ち受け";
+        break;
+      case CHAPT_handWashReady:
+        debugChptElem.innerHTML = "手洗い準備";
+        break;
+      case CHAPT_handWashing:
+        debugChptElem.innerHTML = "手洗い中";
+        break;
+      case CHAPT_handWashSuccess:
+        debugChptElem.innerHTML = "手洗い成功";
+        break;
+      case CHAPT_handWashFault:
+        debugChptElem.innerHTML = "手洗い失敗";
+        break;
+      case CHAPT_stopFlow:
+        debugChptElem.innerHTML = "水停止";
+        break;
+      default:
+    }
 
     nextChapter = funcWaiting(nextChapter);
     nextChapter = funcHandWashReady(nextChapter);
@@ -248,7 +333,7 @@ window.onload = () => {
   };
 
   // 処理開始
-  //kira();
+  kira();
 
   //開始時は待ち受けフェイズに
   nextChapter = CHAPT_waiting;
