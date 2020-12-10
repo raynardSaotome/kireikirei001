@@ -1,8 +1,8 @@
 let WATERFLOWSIGPORT = 18;
 let WATERFLOWFLAG = 1;
-let WATERFLOWPALUSECNT = 3;
+let WATERFLOWPALUSECNT = 2;
 
-let WATERFLOWGetParamInterval = 10;
+let WATERFLOWGetParamInterval = 1;
 let WATERFLOWIsOnLimit = 700;
 
 const waterflowGetter = class {
@@ -11,10 +11,10 @@ const waterflowGetter = class {
     this.pin = pin;
     this.flag = flag;
     this.flowPort = undefined;
-    this.rate_cnt = 0;
+    this.rate_cnt = -1;
     this.flowChkStartTimer = undefined;
     this._isFlow = false;
-    this.previousPulse = 0;
+    this.previousPulse = -1;
     this.monitorElem = undefined;
     this.debug = debug;
     this.debugBtflow = undefined;
@@ -28,45 +28,33 @@ const waterflowGetter = class {
       this.monitorElem.innerHTML = this._isFlow;
     }
 
-    if (!this.flowChkStartTimer) {
-      if (pulse !== this.previousPulse) {
-        this.rate_cnt = 1;
+    if (pulse !== this.previousPulse) {
+      if (this.debug) {
+        console.log("c:--rate_cnt: " + this.rate_cnt);
+        console.log("c:--previousPulse: " + this.previousPulse);
+        console.log("c:--pulse: " + pulse);
+      }
+      this.previousPulse = pulse;
+      this.flowChkStartTimer = undefined;
+      this.rate_cnt += 1;
+    } else {
+      //パルス変化なし
+      if (!this.flowChkStartTimer) {
         this.flowChkStartTimer = new Date();
         this.flowChkStartTimer.setMilliseconds(
           this.flowChkStartTimer.getMilliseconds() + WATERFLOWIsOnLimit
         );
-        this.previousPulse = pulse;
-        if (this.debug) {
-          console.log("c:flow check start");
-        }
       }
-    } else {
+
       if (new Date().getTime() > this.flowChkStartTimer.getTime()) {
         if (this.debug) {
           console.log("c:flow check stop");
           console.log("c:--rate_cnt: " + this.rate_cnt);
         }
-        this.rate_cnt = 0;
         this.flowChkStartTimer = undefined;
+        this.rate_cnt = -1;
         this._isFlow = false;
-      } else if (new Date().getTime() <= this.flowChkStartTimer.getTime()) {
-        if (pulse !== this.previousPulse) {
-          if (this.debug) {
-            console.log("c:pulse change");
-            console.log("c:--rate_cnt: " + this.rate_cnt);
-            console.log("c:--previousPulse: " + this.previousPulse);
-            console.log("c:--pulse: " + pulse);
-          }
-          this.previousPulse = pulse;
-          this.rate_cnt += 1;
-        } else if (pulse === this.previousPulse) {
-          if (this.debug) {
-            console.log("c:pulse hold");
-            console.log("c:--rate_cnt: " + this.rate_cnt);
-            console.log("c:--previousPulse: " + this.previousPulse);
-            console.log("c:--pulse: " + pulse);
-          }
-        }
+        this.previousPulse = -1;
       }
     }
 
@@ -75,6 +63,7 @@ const waterflowGetter = class {
         console.log("c:now flow");
         console.log("c:--rate_cnt: " + this.rate_cnt);
       }
+      this.rate_cnt = -1;
       this._isFlow = true;
       this.previousPulse = -1;
       this.flowChkStartTimer = undefined;

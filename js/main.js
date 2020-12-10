@@ -16,16 +16,16 @@ var nextChapter = 0; // 次に処理するフェイズのフラグ値を格納
 var previousChapter = 0; // 次に処理するフェイズのフラグ値を格納時、現行の処理中フェイズのフラグ値を格納
 const mainloopInterval = 100; // メイン処理の実行間隔
 
-//let mainRoutineDebug = true; // テスト用
-
+//デバッグ画面、テスト用ダミークラス有効科フラグ
 let masterDebugger = {
   showSensorParamDisplay: true,
   useVL53L0XDummy: false,
-  useFlowDummy: true,
+  useFlowDummy: false,
   useWebcamDummy: false
 };
 
 window.onload = () => {
+  //Webカメラ優先選択
   async function getConstraintsDevice(deviceNames, constraints) {
     var device = undefined;
 
@@ -60,7 +60,7 @@ window.onload = () => {
       })
       .catch(function (err) {
         // エラー発生時
-        console.error("enumerateDevide ERROR:", err);
+        console.error("getConstraintsDevice:enumerateDevide ERROR:", err);
       });
   }
 
@@ -80,6 +80,7 @@ window.onload = () => {
       debugElem.style.visibility = "hidden";
     }
 
+    //Webカメラ
     if (masterDebugger.useWebcamDummy) {
       //ダミークラス
       flag.webcam = new webcamDummy(video, canvas, constraints, true);
@@ -90,10 +91,11 @@ window.onload = () => {
         canvas,
         constraints,
         webcamPostponement,
-        true
+        false
       );
     }
 
+    //距離センサ
     if (masterDebugger.useVL53L0XDummy) {
       //ダミークラス
       flag.vl = new VL53L0XGetterDummy(false);
@@ -102,6 +104,7 @@ window.onload = () => {
       flag.vl = new VL53L0XGetter(false);
     }
 
+    //水流センサ
     if (masterDebugger.useFlowDummy) {
       //ダミークラス
       flag.flow = new waterflowGetterDummy(
@@ -110,7 +113,7 @@ window.onload = () => {
         true
       );
     } else {
-      Document.getElementById("btflow").style.visibility = "hidden";
+      document.getElementById("btflow").style.visibility = "hidden";
       flag.flow = new waterflowGetter(WATERFLOWSIGPORT, WATERFLOWFLAG, true);
     }
 
@@ -299,8 +302,8 @@ window.onload = () => {
 
   // メインループ
   const mainloop = () => {
+    //デバッグ用カレントチャプター表示
     var debugChptElem = document.getElementById("debugChpt");
-
     switch (nextChapter) {
       case CHAPT_waiting:
         debugChptElem.innerHTML = "待ち受け";
@@ -323,6 +326,7 @@ window.onload = () => {
       default:
     }
 
+    //チャプター処理開始(ただしnextChapterが、該当のチャプタだけ実行される）
     nextChapter = funcWaiting(nextChapter);
     nextChapter = funcHandWashReady(nextChapter);
     nextChapter = funcHandWashing(nextChapter);

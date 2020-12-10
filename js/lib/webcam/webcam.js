@@ -25,8 +25,6 @@ class webcam {
   }
 
   start(elem) {
-    const _this = this;
-
     var adjustVideo = () => {
       // 映像が画面幅いっぱいに表示されるように調整
       var ratio = window.innerWidth / this.video.videoWidth;
@@ -97,7 +95,7 @@ class webcam {
         };
       })
       .catch((err) => {
-        window.alert(err.name + ": " + err.message);
+        window.alert(this.name + ": " + err.name + ": " + err.message);
       });
   }
 
@@ -119,7 +117,6 @@ class webcamDummy extends webcam {
     this.debugelem = undefined;
     this.debugBtcam = document.getElementById("btcam");
     this.debugret = false;
-    //    var _this = this;
     this.debugBtcam.onclick = () => {
       this.debugBtcam.value = this.debugBtcam.value == 0 ? 1 : 0;
       this.debugret = this.debugBtcam.value == 1 ? true : false;
